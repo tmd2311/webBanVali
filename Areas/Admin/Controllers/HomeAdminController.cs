@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
+using System.Xml.Schema;
 using webBanVali.Models;
 using X.PagedList;
 
@@ -29,9 +29,9 @@ namespace webBanVali.Areas.Admin.Controllers
             return View(lst);
         }
 
+        //Thêm sản phẩm mới 
         [Route("ThemSanPhamMoi")]
         [HttpGet]
-
         public IActionResult ThemSanPhamMoi()
         {
             ViewBag.MaChatLieu = new SelectList(db.TChatLieus.ToList(), "MaChatLieu", "ChatLieu");
@@ -53,6 +53,59 @@ namespace webBanVali.Areas.Admin.Controllers
                 return RedirectToAction("DanhMucSanPham");
             }
             return View(sanPham);
+        }
+
+        //Sửa Sản phẩm 
+        [Route("SuaSanPham")]
+        [HttpGet]
+        public IActionResult SuaSanPham(string maSanPham)
+        {
+            ViewBag.MaChatLieu = new SelectList(db.TChatLieus.ToList(), "MaChatLieu", "ChatLieu");
+            ViewBag.MaHangSx = new SelectList(db.THangSxes.ToList(), "MaHangSx", "HangSx");
+            ViewBag.MaNuocSx = new SelectList(db.TQuocGia.ToList(), "MaNuoc", "TenNuoc");
+            ViewBag.MaLoai = new SelectList(db.TLoaiSps.ToList(), "MaLoai", "Loai");
+            ViewBag.MaDt = new SelectList(db.TLoaiDts.ToList(), "MaDt", "TenLoai");
+            var sanPham = db.TDanhMucSps.Find(maSanPham);
+            return View(sanPham);
+        }
+        [Route("SuaSanPham")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SuaSanPham(TDanhMucSp sanPham)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Entry(sanPham).State = EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("DanhMucSanPham","HomeAdmin");
+            }
+            return View(sanPham);
+        }
+
+
+        [Route("XoaSanPham")]
+        [HttpGet]
+        public IActionResult XoaSanPham(string maSanPham)
+        {
+            TempData["Message"] = "";
+            var chitietSanPhams = db.TChiTietSanPhams.Where(x => x.MaSp == maSanPham).ToList();
+            if (chitietSanPhams.Count > 0)
+            {
+                TempData["Message"] = "Không xóa được sản phẩm này";
+                return RedirectToAction("DanhMucSanPham", "HomeAdmin");
+            }
+            var anhSanPham = db.TAnhSps.Where(x => x.MaSp==maSanPham);
+            if (anhSanPham.Any())
+            {
+                db.RemoveRange(anhSanPham);
+            }
+
+            db.Remove(db.TDanhMucSps.Find(maSanPham));
+            db.SaveChanges();
+            TempData["Message"] = "Sản phẩm được xóa thành công ";
+            return RedirectToAction("DanhMucSanPham", "HomeAdmin");
+          
+
         }
     }
    
