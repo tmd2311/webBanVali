@@ -3,7 +3,7 @@ using webBanVali.Models;
 
 namespace webBanVali.Controllers
 {
-    public class AccessController1 : Controller
+    public class AccessController : Controller
     {
         QlbanVaLiContext db = new QlbanVaLiContext();
         [HttpGet]
@@ -14,10 +14,14 @@ namespace webBanVali.Controllers
                 return View();
 
             }
-            return RedirectToAction("Index", "Home");
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            
         }
         [HttpPost]
-        public IActionResult Logout(TUser user)
+        public IActionResult Login(TUser user)
         {
             if(HttpContext.Session.GetString("UserName")== null)
             {
@@ -30,6 +34,14 @@ namespace webBanVali.Controllers
             }
             return View();
            
+        }
+
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            HttpContext.Session.Remove("UserName");
+            return RedirectToAction("Login", "Access");
         }
     }
 }
