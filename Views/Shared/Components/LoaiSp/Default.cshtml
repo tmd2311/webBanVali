@@ -8,16 +8,12 @@
         <ul>
             @foreach(var item in Model)
             {
-                var getUrl = "https://localhost:7170/api/productapi/"+item.MaLoai;
+                var getUrl = "https://localhost:7170/api/productapi/" + item.MaLoai;
                 <li><a style="cursor:pointer" onclick="showProductByCategory('@getUrl')">@item.Loai</a></li>
-                @* <li><a asp-controller="Home" asp-action="SanPhamTheoLoai" asp-route-maloai="@item.MaLoai">@item.Loai</a></li> *@
             }
         </ul>
     </div>
 </div>
-
-
-
 
 <script>
     function showProductByCategory(getURL) {
@@ -28,11 +24,27 @@
             dataType: 'json',
             success: function (data) {
                 $.each(data, function (key, val) {
-                    str += '<p>' + val.tenSp + '</p>';
+                    str += `
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix oranges fresh-meat">
+                        <div class="featured__item">
+                            <div class="featured__item__pic set-bg" style="background-image: url('../Images/${val.anhDaiDien}');">
+                                <ul class="featured__item__pic__hover">
+                                    <li><a href="#"><i class="fa fa-heart"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-retweet"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-shopping-cart"></i></a></li>
+                                </ul>
+                            </div>
+                            <div class="featured__item__text">
+                                <h6><a href="/Home/ProductDetail?maSp=${val.maSp}">${val.tenSp}</a></h6>
+                                <h5>${val.giaLonNhat} đ</h5>
+                            </div>
+                        </div>
+                    </div>
+                    `;
                 });
                 $('#displayProducts').html(str);
             },
-            Error: function (xhr) {  
+            error: function (xhr) {  
                 alert(xhr.responseText);  
             }
         });
