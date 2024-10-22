@@ -28,6 +28,7 @@ namespace webBanVali.Controllers
             PagedList<TDanhMucSp> lst = new PagedList<TDanhMucSp>(lstsanpham, pageNumber, pageSize);
             return View(lst);
         }
+        //[Authentication]
         public IActionResult SanPhamTheoLoai(String maloai, int? page) 
         {
             int pageSize = 8;
